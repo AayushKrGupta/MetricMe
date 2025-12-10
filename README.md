@@ -1,50 +1,65 @@
-# Welcome to your Expo app 👋
+# 🚀 MetricMe — Your All-in-One Wellness Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Track. Improve. Thrive.**  
+MetricMe brings together *steps, calories, hydration, sleep,* and more into one smart, beautifully designed experience — helping you build a healthier lifestyle every day.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Key Features
 
-   ```bash
-   npm install
-   ```
+- 🏃‍♂️ **Step Counter** — Accurate real-time tracking using device sensors  
+- 🔥 **Calorie Burn Insights** — Personalized metrics based on your body profile  
+- 💧 **Hydration Tracking** — Smart reminders + daily water goals  
+- 😴 **Sleep Awareness** — Monitor daily rest patterns  
+- 🧠 **Mood & Wellness Logs** — Understand your mind-body connection  
+- 🌤️ **Environment Awareness** — Temperature, humidity & air quality insights  
+- 🔔 **Reminders & Streaks** — Stay motivated with goals and achievements  
+- 📊 **Progress Analytics** — Weekly reports, trends & visualization  
+- 🎯 **Custom Goals** — Tailored to your lifestyle and health needs  
 
-2. Start the app
+> MetricMe = Health + Motivation + Intelligence in one place 🧩
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🧩 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Category | Technology |
+|---------|------------|
+| Framework | React Native (Expo) |
+| State Management | Context API / Redux (TBD) |
+| Sensors | Expo Sensors |
+| Charts | react-native-chart-kit / Victory Native |
+| Storage | AsyncStorage / Local DB |
+| Notifications | Expo Notifications |
+| Backend (Future Scope) | Firebase / Supabase |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📱 Screenshots (Coming Soon)
 
-When you're ready, run:
+> UI is under rapid development — sleek design previews arriving shortly 👀✨
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🚧 Development Status
 
-## Learn more
+MetricMe is currently in **active development**.  
+We’re polishing the UI and integrating core functionality:
 
-To learn more about developing your project with Expo, look at the following resources:
+- [x] Basic UI Layout  
+- [ ] Step & Calorie Logic  
+- [ ] Water Tracker  
+- [ ] User Profile + Goals  
+- [ ] Analytics Dashboard  
+- [ ] Notifications  
+- [ ] Launch on Play Store / App Store 🚀  
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 🛠️ Installation & Setup
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```sh
+git clone https://github.com/AayushKrGupta/MetricMe.git
+cd MetricMe
+npm install
+npm start
