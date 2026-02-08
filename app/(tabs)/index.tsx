@@ -1,98 +1,211 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import {
+  AnimatedCircularProgress,
+  StatCard,
+  DateSelector,
+} from '@/components/pedometer';
+import { Colors, Spacing, Radius, FontSize, FontFamily } from '@/constants/theme';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const GOAL_STEPS = 10000;
+const MOCK_STEPS = 5499;
+const MOCK_DURATION = '2h.3m';
+const MOCK_KCAL = '77.8';
+const MOCK_MILES = '0.0';
 
-export default function HomeScreen() {
+export default function TodayScreen() {
+  const insets = useSafeAreaInsets();
+  const [paused, setPaused] = useState(false);
+  const progress = MOCK_STEPS / GOAL_STEPS;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
+          <Pressable style={styles.menuBtn} hitSlop={12}>
+            <MaterialIcons name="menu" size={24} color={Colors.textSecondary} />
+          </Pressable>
+          <Text style={styles.headerTitle}>Today</Text>
+          <View style={styles.headerRight}>
+            <Text style={styles.headerLabel}>Steps</Text>
+            <View style={styles.stepsIcon}>
+              <MaterialIcons name="directions-run" size={20} color={Colors.primary} />
+            </View>
+          </View>
+        </Animated.View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <Animated.View entering={FadeInDown.delay(80).springify()}>
+          <DateSelector />
+        </Animated.View>
+
+        <Animated.View
+          entering={FadeInDown.delay(120).springify()}
+          style={styles.progressSection}
+        >
+          <View style={styles.progressRing}>
+            <AnimatedCircularProgress
+              progress={progress}
+              size={240}
+              strokeWidth={16}
+            />
+            <View style={styles.progressCenter}>
+              <Pressable onPress={() => router.push('/(tabs)/report')} style={styles.reportLink}>
+                <Text style={styles.reportLinkText}>Report &gt;</Text>
+              </Pressable>
+              <Text style={styles.stepCount}>{MOCK_STEPS.toLocaleString()}</Text>
+              <Pressable
+                onPress={() => setPaused((p) => !p)}
+                style={[styles.pauseBtn, paused && styles.pauseBtnActive]}
+              >
+                <Text style={styles.pauseBtnText}>{paused ? 'Resume' : 'Paused'}</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(160).springify()} style={styles.exerciseSection}>
+          <Text style={styles.sectionTitle}>Exercise</Text>
+          <View style={styles.statCards}>
+            <StatCard
+              value={MOCK_DURATION}
+              label="Duration"
+              icon={<MaterialIcons name="schedule" size={20} color={Colors.primary} />}
+            />
+            <StatCard
+              value={MOCK_KCAL}
+              label="Kcal"
+              icon={<MaterialIcons name="local-fire-department" size={20} color={Colors.primary} />}
+            />
+            <StatCard
+              value={MOCK_MILES}
+              label="Mile"
+              icon={<MaterialIcons name="directions-walk" size={20} color={Colors.textSecondary} />}
+            />
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scroll: { flex: 1 },
+  scrollContent: { paddingHorizontal: Spacing.md },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xs,
+  },
+  menuBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: FontSize['2xl'],
+    fontFamily: FontFamily.bold,
+    color: Colors.text,
+    pointerEvents: 'none',
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  headerLabel: {
+    fontSize: FontSize.base,
+    fontWeight: '600',
+    color: Colors.text,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  stepsIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.surfaceElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressSection: {
+    alignItems: 'center',
+    paddingVertical: Spacing.lg,
+  },
+  progressRing: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressCenter: {
     position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reportLink: {
+    marginBottom: Spacing.xs,
+  },
+  reportLinkText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  stepCount: {
+    fontSize: FontSize['4xl'],
+    fontFamily: FontFamily.bold,
+    color: Colors.text,
+    letterSpacing: -1,
+  },
+  pauseBtn: {
+    marginTop: Spacing.md,
+    backgroundColor: Colors.primary,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius.lg,
+  },
+  pauseBtnActive: {
+    opacity: 0.9,
+  },
+  pauseBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: '700',
+    color: Colors.background,
+  },
+  exerciseSection: {
+    paddingTop: Spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: Spacing.md,
+  },
+  statCards: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    flexWrap: 'wrap',
   },
 });
