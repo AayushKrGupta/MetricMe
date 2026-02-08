@@ -45,15 +45,11 @@ export default function ProfileScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInDown.delay(60).springify()} style={styles.inviteCard}>
-          <Text style={styles.inviteTitle}>Invite friend, Get Reward!</Text>
-          <Pressable style={styles.inviteBtn}>
-            <Text style={styles.inviteBtnText}>Invite</Text>
-          </Pressable>
-          <View style={styles.coinsWrap}>
-            <MaterialIcons name="monetization-on" size={44} color={Colors.primary} />
-            <MaterialIcons name="monetization-on" size={36} color={Colors.primary} style={styles.coin2} />
+        <Animated.View entering={FadeInDown.delay(60).springify()} style={styles.profileSection}>
+          <View style={styles.avatarCircle}>
+            <MaterialIcons name="person" size={56} color={Colors.textSecondary} />
           </View>
+          <Text style={styles.userName}>User Name</Text>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
@@ -170,41 +166,31 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
   },
-  inviteCard: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.lg,
-    padding: Spacing.xl,
+  profileSection: {
+    alignItems: 'center',
     marginBottom: Spacing.xl,
-    position: 'relative',
-    overflow: 'hidden',
   },
-  inviteTitle: {
-    fontSize: FontSize.lg,
-    fontFamily: FontFamily.semiBold,
-    color: Colors.text,
-    marginBottom: Spacing.md,
+  avatarCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.card,
+    borderWidth: 3,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  inviteBtn: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.xl,
-    borderRadius: Radius.lg,
+  userName: {
+    fontSize: FontSize.xl,
+    fontFamily: FontFamily.bold,
+    color: Colors.primary,
+    marginTop: Spacing.md,
   },
-  inviteBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: '700',
-    color: Colors.background,
-  },
-  coinsWrap: {
-    position: 'absolute',
-    right: Spacing.lg,
-    bottom: Spacing.lg,
-  },
-  coin2: { position: 'absolute', left: 24, top: 4 },
   section: {
     marginBottom: Spacing.xl,
+    width: '100%',
   },
   sectionHeader: {
     fontSize: 13,
