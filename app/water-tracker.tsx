@@ -7,16 +7,17 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Svg, { Circle } from 'react-native-svg';
 import { Colors, Spacing, Radius, FontSize, FontFamily } from '@/constants/theme';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const RING_SIZE = 220;
+const RING_SIZE = 240;
 const RING_STROKE = 14;
 const RING_R = (RING_SIZE - RING_STROKE) / 2;
-const BAR_DATA = [40, 65, 30, 80, 45, 90, 48];
+const BAR_HEIGHT = 100;
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const BAR_DATA = [35, 42, 38, 90, 45, 55, 48]; // Thu (index 3) tallest
 
 export default function WaterTrackerScreen() {
   const insets = useSafeAreaInsets();
   const [oz, setOz] = useState(48);
-  const progress = oz / 100;
+  const progress = Math.min(1, oz / 100);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -26,7 +27,7 @@ export default function WaterTrackerScreen() {
         </Pressable>
         <Text style={styles.headerTitle}>Water Tracker</Text>
         <Pressable style={styles.headerBtn}>
-          <MaterialIcons name="notifications-none" size={24} color={Colors.text} />
+          <MaterialIcons name="settings" size={24} color={Colors.text} />
         </Pressable>
       </View>
 
@@ -35,10 +36,12 @@ export default function WaterTrackerScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + Spacing['2xl'] }]}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeIn.duration(300)} style={styles.ringSection}>
-          <View style={styles.ringHeader}>
-            <Text style={styles.ringHeaderText}>Today</Text>
-            <Text style={styles.ringHeaderOz}>48 oz</Text>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.todaySection}>
+          <View style={styles.todayHeader}>
+            <Text style={styles.todayTitle}>Today</Text>
+            <View style={styles.notificationPill}>
+              <Text style={styles.notificationText}>notification</Text>
+            </View>
           </View>
           <View style={styles.ringRow}>
             <Pressable onPress={() => setOz((v) => Math.max(0, v - 8))} style={styles.ringBtn}>
@@ -67,8 +70,9 @@ export default function WaterTrackerScreen() {
                 />
               </Svg>
               <View style={styles.ringCenter}>
+                <Text style={styles.ringSubtext}>48 fl oz</Text>
                 <Text style={styles.ringValue}>{oz}</Text>
-                <MaterialIcons name="water-drop" size={32} color={Colors.primary} />
+                <MaterialIcons name="water-drop" size={36} color={Colors.primary} style={styles.glassIcon} />
               </View>
             </View>
             <Pressable onPress={() => setOz((v) => Math.min(100, v + 8))} style={styles.ringBtn}>
@@ -80,24 +84,42 @@ export default function WaterTrackerScreen() {
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.chartSection}>
           <View style={styles.chartHeader}>
             <Text style={styles.chartTitle}>Water (mL)</Text>
-            <Text style={styles.chartRange}>&lt; July 2025 &gt;</Text>
+            <View style={styles.calendarRow}>
+              <Text style={styles.chartRange}>July 2025</Text>
+              <MaterialIcons name="calendar-today" size={18} color={Colors.textSecondary} />
+            </View>
+          </View>
+          <View style={styles.averageRow}>
+            <MaterialIcons name="water-drop" size={18} color={Colors.primary} />
+            <Text style={styles.averageText}>12% Average (1 oz)</Text>
+            <View style={styles.dateRow}>
+              <Pressable style={styles.chevronBtn}>
+                <MaterialIcons name="chevron-left" size={18} color={Colors.textSecondary} />
+              </Pressable>
+              <Text style={styles.dateRange}>Jul 28 - Aug 4</Text>
+              <Pressable style={styles.chevronPill}>
+                <MaterialIcons name="chevron-right" size={18} color={Colors.background} />
+              </Pressable>
+            </View>
           </View>
           <View style={styles.barChart}>
             {BAR_DATA.map((h, i) => (
-              <View key={i} style={styles.barWrap}>
+              <View key={i} style={styles.barCol}>
+                {i === 3 && (
+                  <View style={styles.bubble}>
+                    <Text style={styles.bubbleText}>48 mL</Text>
+                  </View>
+                )}
                 <View
                   style={[
                     styles.bar,
-                    { height: (h / 100) * 120 },
-                    i === BAR_DATA.length - 1 && styles.barActive,
+                    { height: (h / 100) * BAR_HEIGHT },
+                    i === 3 && styles.barActive,
                   ]}
                 />
+                <Text style={styles.barLabel}>{DAYS[i]}</Text>
               </View>
             ))}
-          </View>
-          <View style={styles.chartFooter}>
-            <Text style={styles.chartFooterText}>12% Average (1kg)</Text>
-            <Text style={styles.chartFooterValue}>48 mL</Text>
           </View>
         </Animated.View>
       </ScrollView>
@@ -122,26 +144,42 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: Spacing.md },
-  ringSection: {
-    alignItems: 'center',
+  todaySection: {
     marginBottom: Spacing.xl,
   },
-  ringHeader: {
+  todayHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.sm,
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
   },
-  ringHeaderText: { fontSize: FontSize.sm, color: Colors.textSecondary },
-  ringHeaderOz: { fontSize: FontSize.sm, color: Colors.text },
+  todayTitle: {
+    fontSize: FontSize.lg,
+    fontFamily: FontFamily.bold,
+    color: Colors.text,
+  },
+  notificationPill: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.full,
+  },
+  notificationText: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: Colors.background,
+  },
   ringRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.lg,
   },
   ringBtn: {
     width: 48,
     height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -153,12 +191,20 @@ const styles = StyleSheet.create({
   ringCenter: {
     position: 'absolute',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ringSubtext: {
+    fontSize: FontSize.sm,
+    color: Colors.text,
+    marginBottom: 2,
   },
   ringValue: {
     fontSize: FontSize['4xl'],
     fontFamily: FontFamily.bold,
     color: Colors.text,
-    marginBottom: Spacing.xs,
+  },
+  glassIcon: {
+    marginTop: Spacing.sm,
   },
   chartSection: {
     backgroundColor: Colors.card,
@@ -169,33 +215,75 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   chartTitle: {
     fontSize: FontSize.lg,
     fontFamily: FontFamily.bold,
     color: Colors.text,
   },
+  calendarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
   chartRange: {
     fontSize: FontSize.sm,
     color: Colors.textSecondary,
+  },
+  averageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+    flexWrap: 'wrap',
+  },
+  averageText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginLeft: 'auto',
+  },
+  chevronBtn: { padding: 2 },
+  dateRange: { fontSize: FontSize.xs, color: Colors.textSecondary },
+  chevronPill: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: Radius.full,
   },
   barChart: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    height: 120,
-    gap: Spacing.sm,
+    height: BAR_HEIGHT + 28,
+    gap: 4,
   },
-  barWrap: {
+  barCol: {
     flex: 1,
-    height: 120,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
+  bubble: {
+    position: 'absolute',
+    top: -22,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: Radius.sm,
+  },
+  bubbleText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.background,
+  },
   bar: {
-    width: '80%',
-    minHeight: 8,
+    width: '85%',
+    minHeight: 6,
     backgroundColor: Colors.surfaceElevated,
     borderTopLeftRadius: Radius.sm,
     borderTopRightRadius: Radius.sm,
@@ -203,11 +291,9 @@ const styles = StyleSheet.create({
   barActive: {
     backgroundColor: Colors.primary,
   },
-  chartFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: Spacing.md,
+  barLabel: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    marginTop: 6,
   },
-  chartFooterText: { fontSize: FontSize.sm, color: Colors.textSecondary },
-  chartFooterValue: { fontSize: FontSize.sm, color: Colors.text },
 });

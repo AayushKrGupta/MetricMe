@@ -9,21 +9,24 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Colors, Spacing, Radius, FontSize, FontFamily } from '@/constants/theme';
 
-const SETTINGS_ITEMS = [
-  { icon: 'emoji-events', label: 'Achievements', badge: '3k', href: null },
-  { icon: 'person-outline', label: 'Personal info', suffix: 'V', href: null },
-  { icon: 'tune', label: 'Sensitivity', suffix: 'V', href: null },
-  { icon: 'block', label: 'Stop', href: null },
-  { icon: 'pause-circle-outline', label: 'Pause Step Tracker', toggle: true, href: null },
-  { icon: 'backup', label: 'Backup & Restore', sub: 'G', href: null },
-  { icon: 'notifications-none', label: 'Reminder', href: null },
-  { icon: 'water-drop', label: 'Water Tracker', suffix: 'V', href: '/water-tracker' },
-  { icon: 'language', label: 'Language option', suffix: 'English V', href: null },
-] as const;
+const GROUP_1 = [
+  { icon: 'emoji-events' as const, label: 'Achievements', badge: '3k', href: null },
+  { icon: 'person-outline' as const, label: 'Personal Info', href: null },
+];
+
+const GROUP_2 = [
+  { icon: 'pause-circle-outline' as const, label: 'Pause Step Tracker', toggle: true as const, href: null },
+  { icon: 'notifications-none' as const, label: 'Reminder', href: null },
+];
+
+const GROUP_3 = [
+  { icon: 'water-drop' as const, label: 'Water Tracker', href: '/water-tracker' },
+  { icon: 'language' as const, label: 'Language', suffix: 'English', href: null },
+];
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -31,109 +34,148 @@ export default function ProfileScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Pressable style={styles.headerBtn} hitSlop={12}>
-          <MaterialIcons name="menu" size={24} color={Colors.textSecondary} />
-        </Pressable>
         <Text style={styles.headerTitle}>Profile</Text>
-        <Pressable
-          onPress={() => router.push('/settings')}
-          style={styles.headerBtn}
-          hitSlop={12}
-        >
-          <MaterialIcons name="settings" size={24} color={Colors.textSecondary} />
-        </Pressable>
       </View>
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 120 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInDown.delay(80).springify()} style={styles.inviteCard}>
+        <Animated.View entering={FadeInDown.delay(60).springify()} style={styles.inviteCard}>
           <Text style={styles.inviteTitle}>Invite friend, Get Reward!</Text>
           <Pressable style={styles.inviteBtn}>
             <Text style={styles.inviteBtnText}>Invite</Text>
           </Pressable>
           <View style={styles.coinsWrap}>
-            <MaterialIcons name="monetization-on" size={48} color={Colors.primary} />
-            <MaterialIcons name="monetization-on" size={40} color={Colors.primary} style={styles.coin2} />
-            <MaterialIcons name="monetization-on" size={36} color={Colors.primary} style={styles.coin3} />
+            <MaterialIcons name="monetization-on" size={44} color={Colors.primary} />
+            <MaterialIcons name="monetization-on" size={36} color={Colors.primary} style={styles.coin2} />
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(120).springify()} style={styles.settingsList}>
-          {SETTINGS_ITEMS.map((item, i) => (
-            <Pressable
-              key={item.label}
-              style={styles.settingsRow}
-              onPress={() => item.href != null && router.push(item.href as any)}
-            >
-              <View style={styles.settingsRowLeft}>
-                {item.icon === 'backup' ? (
-                  <View style={styles.gIcon}>
-                    <Text style={styles.gIconText}>G</Text>
-                  </View>
-                ) : (
-                  <MaterialIcons
-                    name={item.icon as any}
-                    size={22}
-                    color={item.label === 'Achievements' ? Colors.primary : Colors.textSecondary}
-                  />
-                )}
-                <Text style={styles.settingsLabel}>{item.label}</Text>
-                {item.badge != null && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.badge}</Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.settingsRowRight}>
-                {item.toggle === true ? (
-                  <Switch
-                    value={false}
-                    onValueChange={() => {}}
-                    trackColor={{ false: Colors.surfaceElevated, true: Colors.primary }}
-                    thumbColor={Colors.text}
-                  />
-                ) : (
-                  <>
-                    {item.suffix != null && (
-                      <Text style={styles.suffixText}>{item.suffix}</Text>
-                    )}
-                    <MaterialIcons name="chevron-right" size={22} color={Colors.textSecondary} />
-                  </>
-                )}
-              </View>
-            </Pressable>
-          ))}
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
+          <Text style={styles.sectionHeader}>ACCOUNT</Text>
+          <View style={styles.group}>
+            {GROUP_1.map((item, i) => (
+              <Row key={item.label} item={item} isFirst={i === 0} isLast={i === GROUP_1.length - 1} />
+            ))}
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(140).springify()} style={styles.section}>
+          <Text style={styles.sectionHeader}>PREFERENCES</Text>
+          <View style={styles.group}>
+            {GROUP_2.map((item, i) => (
+              <Row key={item.label} item={item} isFirst={i === 0} isLast={i === GROUP_2.length - 1} />
+            ))}
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(180).springify()} style={styles.section}>
+          <Text style={styles.sectionHeader}>MORE</Text>
+          <View style={styles.group}>
+            {GROUP_3.map((item, i) => (
+              <Row key={item.label} item={item} isFirst={i === 0} isLast={i === GROUP_3.length - 1} />
+            ))}
+          </View>
         </Animated.View>
       </ScrollView>
     </View>
   );
 }
 
+type RowItem = {
+  icon: string;
+  label: string;
+  badge?: string;
+  suffix?: string;
+  toggle?: boolean;
+  href: string | null;
+};
+
+function Row({
+  item,
+  isFirst,
+  isLast,
+}: {
+  item: RowItem;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  return (
+    <Pressable
+      style={[
+        styles.row,
+        isFirst && styles.rowFirst,
+        isLast && styles.rowLast,
+        !isLast && styles.rowBorder,
+      ]}
+      onPress={() => item.href != null && router.push(item.href as any)}
+    >
+      <View style={styles.rowLeft}>
+        <MaterialIcons
+          name={item.icon as any}
+          size={22}
+          color={item.label === 'Achievements' ? Colors.primary : Colors.textSecondary}
+        />
+        <Text style={styles.rowLabel}>{item.label}</Text>
+        {item.badge != null && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{item.badge}</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.rowRight}>
+        {item.toggle === true ? (
+          <Switch
+            value={false}
+            onValueChange={() => {}}
+            trackColor={{ false: Colors.surfaceElevated, true: Colors.primary }}
+            thumbColor={Colors.text}
+          />
+        ) : (
+          <>
+            {item.suffix != null && (
+              <Text style={styles.suffixText}>{item.suffix}</Text>
+            )}
+            {item.href != null || item.suffix != null ? (
+              <MaterialIcons name="chevron-right" size={20} color={Colors.textMuted} />
+            ) : null}
+          </>
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  headerBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  header: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+  },
   headerTitle: {
     fontSize: FontSize.xl,
     fontFamily: FontFamily.bold,
     color: Colors.text,
   },
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: Spacing.md },
+  scrollContent: {
+    paddingHorizontal: Spacing.lg,
+  },
   inviteCard: {
     backgroundColor: Colors.card,
-    borderRadius: Radius.xl,
+    borderRadius: Radius.lg,
     padding: Spacing.xl,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -160,64 +202,71 @@ const styles = StyleSheet.create({
     right: Spacing.lg,
     bottom: Spacing.lg,
   },
-  coin2: { position: 'absolute', left: 28, top: -4 },
-  coin3: { position: 'absolute', left: 52, top: 8 },
-  settingsList: {
+  coin2: { position: 'absolute', left: 24, top: 4 },
+  section: {
+    marginBottom: Spacing.xl,
+  },
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textMuted,
+    letterSpacing: 0.2,
+    marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  group: {
     backgroundColor: Colors.card,
-    borderRadius: Radius.xl,
+    borderRadius: Radius.lg,
     overflow: 'hidden',
   },
-  settingsRow: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
+    paddingVertical: 14,
     paddingHorizontal: Spacing.md,
+  },
+  rowFirst: {
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
+  },
+  rowLast: {
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+  },
+  rowBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
-  settingsRowLeft: {
+  rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
     flex: 1,
   },
-  settingsLabel: {
+  rowLabel: {
     fontSize: FontSize.base,
     color: Colors.text,
     flex: 1,
   },
-  settingsRowRight: {
+  rowRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
   },
   badge: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: Radius.sm,
+    borderRadius: 6,
   },
   badgeText: {
-    fontSize: FontSize.xs,
+    fontSize: 12,
     fontWeight: '700',
     color: Colors.background,
   },
   suffixText: {
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
-  },
-  gIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gIconText: {
-    fontSize: FontSize.sm,
-    fontWeight: '700',
-    color: Colors.text,
+    color: Colors.textMuted,
   },
 });

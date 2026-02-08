@@ -33,13 +33,11 @@ export default function TodayScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
-          <Pressable style={styles.menuBtn} hitSlop={12}>
-            <MaterialIcons name="menu" size={24} color={Colors.textSecondary} />
-          </Pressable>
+          <View style={styles.menuBtn} />
           <Text style={styles.headerTitle}>Today</Text>
           <View style={styles.headerRight}>
             <Text style={styles.headerLabel}>Steps</Text>
@@ -49,7 +47,7 @@ export default function TodayScreen() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(80).springify()}>
+        <Animated.View entering={FadeInDown.delay(80).springify()} style={styles.dateSection}>
           <DateSelector />
         </Animated.View>
 
@@ -84,17 +82,20 @@ export default function TodayScreen() {
             <StatCard
               value={MOCK_DURATION}
               label="Duration"
-              icon={<MaterialIcons name="schedule" size={20} color={Colors.primary} />}
+              icon={<MaterialIcons name="schedule" size={24} color={Colors.primary} />}
+              size="large"
             />
             <StatCard
               value={MOCK_KCAL}
               label="Kcal"
-              icon={<MaterialIcons name="local-fire-department" size={20} color={Colors.primary} />}
+              icon={<MaterialIcons name="local-fire-department" size={24} color={Colors.primary} />}
+              size="large"
             />
             <StatCard
               value={MOCK_MILES}
               label="Mile"
-              icon={<MaterialIcons name="directions-walk" size={20} color={Colors.textSecondary} />}
+              icon={<MaterialIcons name="directions-walk" size={24} color={Colors.textSecondary} />}
+              size="large"
             />
           </View>
         </Animated.View>
@@ -109,19 +110,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: Spacing.md },
+  scrollContent: {
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.xs,
+    width: '100%',
+    alignSelf: 'center',
   },
   menuBtn: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dateSection: {
+    width: '100%',
   },
   headerTitle: {
     position: 'absolute',
@@ -153,7 +162,9 @@ const styles = StyleSheet.create({
   },
   progressSection: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: Spacing.lg,
+    width: '100%',
   },
   progressRing: {
     position: 'relative',
@@ -196,16 +207,21 @@ const styles = StyleSheet.create({
   },
   exerciseSection: {
     paddingTop: Spacing.lg,
+    width: '100%',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: FontSize.lg,
     fontWeight: '700',
     color: Colors.text,
     marginBottom: Spacing.md,
+    alignSelf: 'flex-start',
   },
   statCards: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: Spacing.lg,
     flexWrap: 'wrap',
+    justifyContent: 'center',
+    width: '100%',
   },
 });
