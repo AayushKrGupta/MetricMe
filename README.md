@@ -8,12 +8,18 @@ MetricMe brings together *steps, calories, hydration, sleep,* and more into one 
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="assets/images/1.jpg" width="800"/>
-  <img src="assets/images/2.jpg" width="800"/>
-  <img src="assets/images/3.jpg" width="800"/>
-  <img src="assets/images/4.jpg" width="800"/>
-  <img src="assets/images/5.jpg" width="800"/>
-  <img src="assets/images/6.jpg" width="800"/>
+  <img src="assets/images/1.jpg" width="45%"/>
+  <img src="assets/images/2.jpg" width="45%"/>
+</p>
+
+<p align="center">
+  <img src="assets/images/3.jpg" width="45%"/>
+  <img src="assets/images/4.jpg" width="45%"/>
+</p>
+
+<p align="center">
+  <img src="assets/images/5.jpg" width="45%"/>
+  <img src="assets/images/6.jpg" width="45%"/>
 </p>
 
 
