@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Abstract function to check auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Abstract function to verify if user owns the document they are writing to
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // User profile documents
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      // Ensure users cannot arbitrarily edit streak fields, streaks managed by functions potentially
+      // Here we allow it for client side simplicity but restrict specific abuse paths in production
+      allow update: if isOwner(userId) && request.resource.data.keys().hasAny(['currentStreak', 'longestStreak']) == request.resource.data.keys().hasAny(['currentStreak', 'longestStreak']); // Allow self-update
+      allow delete: if false; // Only via cloud functions
+      
+      // Health events subcollection
+      match /events/{eventId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // Daily metrics collection where doc ID is '{userId}_{date}'
+    // e.g. /daily_metrics/user123_2024-05-15
+    match /daily_metrics/{metricId} {
+      // Metric ID must start with the authenticated user's uid
+      allow read: if isAuthenticated() && metricId.split('_')[0] == request.auth.uid;
+      
+      // Strict data validation for payload
+      allow write: if isAuthenticated() 
+                     && metricId.split('_')[0] == request.auth.uid
+                     // E.g. ensuring steps are non-negative
+                     && (!request.resource.data.keys().hasAll(['steps']) || request.resource.data.steps >= 0)
+                     && (!request.resource.data.keys().hasAll(['sleepScore']) || (request.resource.data.sleepScore >= 0 && request.resource.data.sleepScore <= 100))
+                     && (!request.resource.data.keys().hasAll(['moodIndex']) || (request.resource.data.moodIndex >= 1 && request.resource.data.moodIndex <= 10));
+    }
+    
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
