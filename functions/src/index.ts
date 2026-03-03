@@ -28,31 +28,54 @@ export const calculateWeeklyTrends = functions.firestore
 export const checkStreaksEngine = functions.pubsub.schedule('0 0 * * *')
     .timeZone('UTC')
     .onRun(async (context) => {
-        console.log('Running daily streak checker...');
+        functions.logger.info('Running daily streak checker...');
 
-        const usersSnap = await db.collection('users').get();
+        try {
+            const now = new Date();
+            // yesterdayMidNight = Today 00:00 - 24 hours
+            const yesterdayMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1));
 
-        const batch = db.batch();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+            // Query only users who have a streak and whose last activity was BEFORE yesterday.
+            // This avoids processing 1M+ users and only touches those who actually need a reset.
+            // Requires a composite index: users { currentStreak: 1, lastActiveDate: 1 }
+            const usersSnap = await db.collection('users')
+                .where('currentStreak', '>', 0)
+                .where('lastActiveDate', '<', yesterdayMidnight)
+                .get();
 
-        usersSnap.forEach((doc) => {
-            const userData = doc.data();
-            const lastActive = userData.lastActiveDate ? userData.lastActiveDate.toDate() : null;
-
-            if (!lastActive) return; // Never active
-
-            // If difference > 1 day, reset streak
-            const diffTime = Math.abs(today.getTime() - lastActive.getTime());
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays > 1 && userData.currentStreak > 0) {
-                const userRef = db.collection('users').doc(doc.id);
-                batch.update(userRef, { currentStreak: 0 });
+            if (usersSnap.empty) {
+                functions.logger.info('No streaks need resetting today.');
+                return null;
             }
-        });
 
-        await batch.commit();
-        console.log('Streak check completed.');
+            functions.logger.info(`Found ${usersSnap.size} users with expired streaks.`);
+
+            let batch = db.batch();
+            let count = 0;
+            const BATCH_LIMIT = 500;
+
+            for (const doc of usersSnap.docs) {
+                batch.update(doc.ref, {
+                    currentStreak: 0,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+                count++;
+
+                // Firestore batch limit is 500 operations
+                if (count === BATCH_LIMIT) {
+                    await batch.commit();
+                    batch = db.batch();
+                    count = 0;
+                }
+            }
+
+            if (count > 0) {
+                await batch.commit();
+            }
+
+            functions.logger.info('Streak check completed successfully.');
+        } catch (error) {
+            functions.logger.error('Error in checkStreaksEngine:', error);
+        }
         return null;
     });
